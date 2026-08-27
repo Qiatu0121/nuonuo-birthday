@@ -138,6 +138,15 @@
   .balloon .blob::after{ content:''; position:absolute; left:16px; top:15px; width:20px; height:28px;
     background:rgba(255,255,255,.9); border-radius:50%; transform:rotate(-26deg); }
   @keyframes sway{ 0%,100%{ transform:rotate(-5deg) translateX(-3px);} 50%{ transform:rotate(5deg) translateX(3px);} }
+  /* 手机端气球缩小 */
+  @media (max-width:768px){
+    .balloon{ bottom:-150px; width:52px; height:70px; }
+    .balloon .blob{ width:50px; height:60px;
+      box-shadow:inset -6px -8px 12px rgba(0,0,0,.16), inset 3px 3px 6px rgba(255,255,255,.5); }
+    .balloon .blob::after{ left:10px; top:9px; width:12px; height:17px; }
+    .balloon .knot{ border-left:5px solid transparent; border-right:5px solid transparent; border-top:8px solid #fff; }
+    .balloon .string{ height:56px; }
+  }
   .balloon .knot{ width:0; height:0; margin:-1px auto 0;
     border-left:9px solid transparent; border-right:9px solid transparent; border-top:13px solid #fff; }
   .balloon .string{ width:2px; height:96px; margin:0 auto;
@@ -438,7 +447,7 @@
                 size: this.config.particleSize,
                 vertexColors: true,
                 transparent: true,
-                opacity: 0.8,
+                opacity: 1.0,
                 blending: THREE.AdditiveBlending
             });
 
@@ -1021,11 +1030,11 @@
     frameDt = Math.min((now - (frame._last||now))/1000, 0.05);
     frame._last = now;
     /* 后台环境粒子 */
-    if(BACK.filter(function(p){return p.kind==='sparkle';}).length < 34 && Math.random()<0.08)
+    if(BACK.filter(function(p){return p.kind==='sparkle';}).length < 55 && Math.random()<0.10)
       BACK.push(makeP({x:Math.random()*W, y:Math.random()*H, size:3+Math.random()*5,
         color:pick(GOLD), shape:'star4', life:1.6+Math.random()*1.8, rot:Math.random()*6.28,
         vr:(Math.random()-.5)*1, fadeIn:.4, fadeOut:.6, kind:'sparkle'}));
-    if(BACK.filter(function(p){return p.kind==='glow';}).length < 16 && Math.random()<0.06)
+    if(BACK.filter(function(p){return p.kind==='glow';}).length < 24 && Math.random()<0.07)
       BACK.push(makeP({x:Math.random()*W, y:Math.random()*H, size:22+Math.random()*42,
         color:pick(GLOWC), shape:'glow', life:6+Math.random()*4, sway:.4, swayAmp:10,
         alpha:.5, fadeIn:.6, fadeOut:.8, kind:'glow'}));
@@ -1038,9 +1047,9 @@
     updateDrawTrails(frameDt);
 
     /* 前景雨：彩带 / 爱心 / 泡泡 */
-    if(Math.random() < frameDt*7 && FRONT.length < 360) spawnRain();
-    if(Math.random() < frameDt*1.1 && FRONT.length < 360) spawnRisingHeart();
-    if(Math.random() < frameDt*0.4 && FRONT.length < 360) spawnBubble();
+    if(Math.random() < frameDt*9 && FRONT.length < 480) spawnRain();
+    if(Math.random() < frameDt*1.5 && FRONT.length < 480) spawnRisingHeart();
+    if(Math.random() < frameDt*0.55 && FRONT.length < 480) spawnBubble();
 
     fctx.clearRect(0,0,W,H); render(FRONT, fctx);
     requestAnimationFrame(frame);
@@ -1257,8 +1266,8 @@
         var opts = {
           text: '诺诺\n生日快乐!',
           candleColor: '#FFD166',
-          particleCount: isMobile ? 18000 : 36000,
-          particleSize: isMobile ? 1.5 : 3.2
+          particleCount: isMobile ? 26000 : 36000,
+          particleSize: isMobile ? 2.0 : 3.2
         };
         if(isMobile){ opts.fov = 60; opts.cameraZ = 265; opts.textScale = 1.9; }
         else { opts.fov = 48; opts.cameraZ = 385; opts.textScale = 0.52; }
