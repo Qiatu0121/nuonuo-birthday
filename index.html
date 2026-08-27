@@ -140,12 +140,12 @@
   @keyframes sway{ 0%,100%{ transform:rotate(-5deg) translateX(-3px);} 50%{ transform:rotate(5deg) translateX(3px);} }
   /* 手机端气球缩小 */
   @media (max-width:768px){
-    .balloon{ bottom:-150px; width:52px; height:70px; }
-    .balloon .blob{ width:50px; height:60px;
-      box-shadow:inset -6px -8px 12px rgba(0,0,0,.16), inset 3px 3px 6px rgba(255,255,255,.5); }
-    .balloon .blob::after{ left:10px; top:9px; width:12px; height:17px; }
-    .balloon .knot{ border-left:5px solid transparent; border-right:5px solid transparent; border-top:8px solid #fff; }
-    .balloon .string{ height:56px; }
+    .balloon{ bottom:-110px; width:34px; height:48px; }
+    .balloon .blob{ width:36px; height:44px;
+      box-shadow:inset -4px -6px 9px rgba(0,0,0,.16), inset 2px 2px 5px rgba(255,255,255,.5); }
+    .balloon .blob::after{ left:8px; top:6px; width:9px; height:13px; }
+    .balloon .knot{ border-left:3.5px solid transparent; border-right:3.5px solid transparent; border-top:6px solid #fff; }
+    .balloon .string{ height:40px; }
   }
   .balloon .knot{ width:0; height:0; margin:-1px auto 0;
     border-left:9px solid transparent; border-right:9px solid transparent; border-top:13px solid #fff; }
@@ -554,8 +554,8 @@
                 currentIndex += green;
             }
 
-            /* 6 根金色蜡烛（中央一圈） */
-            const candles = 6;
+            /* 1 根大金烛（正中） */
+            const candles = 1;
             const nCandle = Math.floor(pCount * 0.06);
             const perCandle = Math.floor(nCandle / candles);
             const candleBaseY = 58;
@@ -564,8 +564,8 @@
             this.colorObj.getHSL(candleHsl);
             for (let k = 0; k < candles; k++) {
                 const a = k / candles * Math.PI * 2;
-                const cx0 = Math.cos(a) * 20, cz0 = Math.sin(a) * 20;
-                this.createCylinderPoints(perCandle, 7, 55, this.targetPositions, this.colors, currentIndex, candleHsl, candleBaseY, this.types, 1, cx0, cz0);
+                const cx0 = candles === 1 ? 0 : Math.cos(a) * 20, cz0 = candles === 1 ? 0 : Math.sin(a) * 20;
+                this.createCylinderPoints(perCandle, candles === 1 ? 12 : 7, candles === 1 ? 60 : 55, this.targetPositions, this.colors, currentIndex, candleHsl, candleBaseY, this.types, 1, cx0, cz0);
                 currentIndex += perCandle;
             }
 
@@ -575,9 +575,9 @@
             const perFlame = Math.floor(nFlame / candles);
             for (let k = 0; k < candles; k++) {
                 const a = k / candles * Math.PI * 2;
-                const cx0 = Math.cos(a) * 20, cz0 = Math.sin(a) * 20;
+                const cx0 = candles === 1 ? 0 : Math.cos(a) * 20, cz0 = candles === 1 ? 0 : Math.sin(a) * 20;
                 const nk = perFlame + (k < nFlame % candles ? 1 : 0);
-                this.createCylinderPoints(nk, 6, 16, this.targetPositions, this.colors, currentIndex, flameHsl, candleBaseY + 55, this.types, 2, cx0, cz0);
+                this.createCylinderPoints(nk, candles === 1 ? 10 : 6, candles === 1 ? 22 : 16, this.targetPositions, this.colors, currentIndex, flameHsl, candleBaseY + (candles === 1 ? 60 : 55), this.types, 2, cx0, cz0);
                 currentIndex += nk;
             }
 
@@ -1030,11 +1030,11 @@
     frameDt = Math.min((now - (frame._last||now))/1000, 0.05);
     frame._last = now;
     /* 后台环境粒子 */
-    if(BACK.filter(function(p){return p.kind==='sparkle';}).length < 55 && Math.random()<0.10)
+    if(BACK.filter(function(p){return p.kind==='sparkle';}).length < 34 && Math.random()<0.08)
       BACK.push(makeP({x:Math.random()*W, y:Math.random()*H, size:3+Math.random()*5,
         color:pick(GOLD), shape:'star4', life:1.6+Math.random()*1.8, rot:Math.random()*6.28,
         vr:(Math.random()-.5)*1, fadeIn:.4, fadeOut:.6, kind:'sparkle'}));
-    if(BACK.filter(function(p){return p.kind==='glow';}).length < 24 && Math.random()<0.07)
+    if(BACK.filter(function(p){return p.kind==='glow';}).length < 16 && Math.random()<0.06)
       BACK.push(makeP({x:Math.random()*W, y:Math.random()*H, size:22+Math.random()*42,
         color:pick(GLOWC), shape:'glow', life:6+Math.random()*4, sway:.4, swayAmp:10,
         alpha:.5, fadeIn:.6, fadeOut:.8, kind:'glow'}));
@@ -1047,9 +1047,9 @@
     updateDrawTrails(frameDt);
 
     /* 前景雨：彩带 / 爱心 / 泡泡 */
-    if(Math.random() < frameDt*9 && FRONT.length < 480) spawnRain();
-    if(Math.random() < frameDt*1.5 && FRONT.length < 480) spawnRisingHeart();
-    if(Math.random() < frameDt*0.55 && FRONT.length < 480) spawnBubble();
+    if(Math.random() < frameDt*7 && FRONT.length < 360) spawnRain();
+    if(Math.random() < frameDt*1.1 && FRONT.length < 360) spawnRisingHeart();
+    if(Math.random() < frameDt*0.4 && FRONT.length < 360) spawnBubble();
 
     fctx.clearRect(0,0,W,H); render(FRONT, fctx);
     requestAnimationFrame(frame);
@@ -1266,8 +1266,8 @@
         var opts = {
           text: '诺诺\n生日快乐!',
           candleColor: '#FFD166',
-          particleCount: isMobile ? 26000 : 36000,
-          particleSize: isMobile ? 2.0 : 3.2
+          particleCount: isMobile ? 36000 : 48000,
+          particleSize: isMobile ? 2.4 : 3.6
         };
         if(isMobile){ opts.fov = 60; opts.cameraZ = 265; opts.textScale = 1.9; }
         else { opts.fov = 48; opts.cameraZ = 385; opts.textScale = 0.52; }
