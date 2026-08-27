@@ -670,7 +670,7 @@
             const scale = this.config.textScale;
 
             /* 拼字时粒子变小、深度收窄，文字更清晰 */
-            this.particles.material.size = this.config.particleSize * 0.7;
+            this.particles.material.size = this.config.particleSize * (this.isMobile ? 1.0 : 0.8);
 
             for (let i = 0; i < pCount; i++) {
                 const i3 = i * 3;
@@ -682,7 +682,7 @@
 
                 /* 金→暖白渐变，呼应梵高的金星 */
                 const nx = (targetPixel.x + canvasWidth / 2) / canvasWidth;
-                this.colorObj.setHSL(0.12 - nx * 0.02, 0.9, 0.52 + nx * 0.16);
+                this.colorObj.setHSL(0.12 - nx * 0.02, 0.9, 0.55 + nx * 0.18);
                 this.colors[i3] = this.colorObj.r;
                 this.colors[i3 + 1] = this.colorObj.g;
                 this.colors[i3 + 2] = this.colorObj.b;
@@ -803,9 +803,16 @@
   function pick(a){ return a[ri(a.length)]; }
 
   /* ================= 声音 ================= */
-  var actx = null;
+  var actx = null, masterGain = null;
   function audio(){
-    if(!actx){ try{ actx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} }
+    if(!actx){
+      try{
+        actx = new (window.AudioContext||window.webkitAudioContext)();
+        masterGain = actx.createGain();
+        masterGain.gain.value = 1;
+        masterGain.connect(actx.destination);
+      }catch(e){}
+    }
     if(actx && actx.state==='suspended'){ actx.resume().catch(function(){}); }
     return actx;
   }
@@ -819,7 +826,7 @@
     g.gain.setValueAtTime(0.0001, t);
     g.gain.exponentialRampToValueAtTime(vol||0.25, t+0.02);
     g.gain.exponentialRampToValueAtTime(0.0001, t+dur);
-    o.connect(g); g.connect(c.destination);
+    o.connect(g); g.connect(masterGain || c.destination);
     o.start(t); o.stop(t+dur+0.06);
   }
   function noise(dur, vol, delay, freq, type){
@@ -834,7 +841,7 @@
     var g = c.createGain();
     g.gain.setValueAtTime(vol||0.3, t);
     g.gain.exponentialRampToValueAtTime(0.0001, t+dur);
-    src.connect(f); f.connect(g); g.connect(c.destination);
+    src.connect(f); f.connect(g); g.connect(masterGain || c.destination);
     src.start(t); src.stop(t+dur+0.05);
   }
   function popSound(){ noise(0.09,0.4,0,1600); tone(340,0.12,'square',0.13,0,170); }
@@ -1205,15 +1212,20 @@
   /* ================= 背景音乐开关 ================= */
   var musicOn = false, musicTimer = null;
   function setMusic(on){
-    if(on && !musicOn){
+    if(on){
+      audio();
+      if(masterGain){ masterGain.gain.setTargetAtTime(1, actx.currentTime, 0.03); }
       musicOn = true;
-      musicTimer = setInterval(song, 11000);
-      song();
+      if(!musicTimer){
+        musicTimer = setInterval(song, 11500);
+        song();
+      }
       $('musicIcon').textContent = '🔊';
       $('btn-music').classList.add('on');
-    } else if(!on && musicOn){
+    } else {
+      audio();
+      if(masterGain){ masterGain.gain.setTargetAtTime(0, actx.currentTime, 0.03); }
       musicOn = false;
-      clearInterval(musicTimer); musicTimer = null;
       $('musicIcon').textContent = '🔇';
       $('btn-music').classList.remove('on');
     }
@@ -1269,8 +1281,8 @@
         var opts = {
           text: '诺诺\n生日快乐!',
           candleColor: '#FFD166',
-          particleCount: isMobile ? 36000 : 48000,
-          particleSize: isMobile ? 2.4 : 3.6
+          particleCount: isMobile ? 50000 : 60000,
+          particleSize: isMobile ? 2.5 : 3.8
         };
         if(isMobile){ opts.fov = 60; opts.cameraZ = 265; opts.textScale = 1.9; }
         else { opts.fov = 48; opts.cameraZ = 385; opts.textScale = 0.52; }
