@@ -1194,7 +1194,7 @@
     }
     cardOpened = true;
     $('birthdayCard').classList.add('opened');
-    audio(); chime();
+    audio(); chime(); setMusic(true);
     var r = $('birthdayCard').getBoundingClientRect();
     fxBurst(r.left + r.width/2, r.top + r.height/2, 18, 1);
   });
@@ -1286,7 +1286,7 @@
     micStop();
     if(cakeReady && cake){ try{ cake.explode(); }catch(e){} }
     whoosh(); chime();
-    setTimeout(function(){ song(); }, 700);
+    if(!musicOn) setTimeout(function(){ song(); }, 700);
     startFireworks();
     var r = $('cake-box').getBoundingClientRect();
     fxBurst(r.left + r.width/2, r.top + r.height/2, 40, 1.1);
@@ -1380,7 +1380,7 @@
     $('hint').textContent = '🎉 诺诺，生日快乐！';
     toast('🎉 生日快乐！愿你吃嘛嘛香，身体棒棒！');
     chime();
-    setTimeout(function(){ song(); }, 500);
+    if(!musicOn) setTimeout(function(){ song(); }, 500);
     confettiStorm(60);
     var r = $('cake-box').getBoundingClientRect();
     var cx = r.left + r.width/2, cy = r.top + r.height/3;
