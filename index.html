@@ -767,7 +767,7 @@
             const scale = this.config.textScale;
 
             /* 拼字时粒子变小、深度收窄，文字更清晰 */
-            this.particles.material.size = this.config.particleSize * (this.isMobile ? 1.0 : 0.8);
+            this.particles.material.size = this.config.particleSize * (this.isMobile ? 1.6 : 1.0);
 
             for (let i = 0; i < pCount; i++) {
                 const i3 = i * 3;
@@ -779,7 +779,7 @@
 
                 /* 金→暖白渐变，呼应梵高的金星 */
                 const nx = (targetPixel.x + canvasWidth / 2) / canvasWidth;
-                this.colorObj.setHSL(0.58 - nx * 0.05, 0.85, 0.62 + nx * 0.18);
+                this.colorObj.setHSL(0.12 - nx * 0.03, 0.95, 0.62 + nx * 0.22);
                 this.colors[i3] = this.colorObj.r;
                 this.colors[i3 + 1] = this.colorObj.g;
                 this.colors[i3 + 2] = this.colorObj.b;
@@ -910,7 +910,7 @@
     try{ a.currentTime = 0; var pp = a.play(); return pp || Promise.resolve(); }catch(e){ return Promise.resolve(); }
   }
   var _clickPlayed = false;
-  function playClick(){ if(_clickPlayed) return; _clickPlayed = true; playSnd('click'); }
+  function playClick(){ if(_clickPlayed) return; _clickPlayed = true; var pp = playSnd('click'); if(pp && pp.catch) pp.catch(function(){}); }
 
   /* ===== 静音解锁：尽早打通音频，提高自动播放成功率 ===== */
   var _unlocked = false;
