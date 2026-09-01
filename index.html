@@ -164,21 +164,23 @@
   @keyframes glowPulse{ 0%,100%{ opacity:.85; transform:scale(1);} 50%{ opacity:1; transform:scale(1.05);} }
 
   /* ============ 蛋糕区（3D 粒子蛋糕，居中） ============ */
-  .cake-halo{ position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); z-index:9;
+  .cake-halo{ position:absolute; left:54%; top:50%; transform:translate(-50%,-50%); z-index:9;
     width:var(--cw); height:calc(var(--cw)*0.95);
     background:radial-gradient(circle, rgba(255,255,255,.3), rgba(130,100,200,.18) 45%, transparent 72%);
     filter:blur(10px); }
-  #cake-box{ position:absolute; left:50%; top:50%; transform:translate(-50%,-50%) scale(.8); z-index:11;
+  #cake-box{ position:absolute; left:54%; top:50%; transform:translate(-50%,-50%) scale(.8); z-index:11;
     width:var(--cw); height:calc(var(--cw)*0.9);
     opacity:0; transition:opacity .8s ease, transform .8s ease;
     cursor:pointer; }
   #cake-box.show{ opacity:1; transform:translate(-50%,-50%) scale(1); }
+  #cake-box.final{ position:fixed; left:0; top:0; width:100vw; height:100vh;
+    transform:none; transition:none; z-index:40; pointer-events:none; }
   #cake-box .cake-fallback{ position:absolute; inset:0; display:none;
     flex-direction:column; align-items:center; justify-content:center;
     font-size:64px; filter:drop-shadow(0 10px 18px rgba(90,40,140,.35)); }
 
   /* ============ 精致的艾莎公主（右下角帧动画） ============ */
-  .elsa{ position:absolute; left:4%; bottom:8%; width:min(36vw,320px); aspect-ratio:300/420;
+  .elsa{ position:absolute; left:4%; bottom:8%; width:min(42vw,360px); aspect-ratio:300/420;
     z-index:12; pointer-events:none; transform-origin:bottom center;
     animation:elsaIdle 3.5s ease-in-out infinite; }
   .elsa svg{ display:block; width:100%; height:auto;
@@ -697,7 +699,7 @@
                 const v = Math.random();
                 const theta = 2 * Math.PI * u;
                 const phi = Math.acos(2 * v - 1);
-                const speed = 2 + Math.random() * 8;
+                const speed = 2 + Math.random() * 14;
                 
                 this.velocities[i3] = Math.sin(phi) * Math.cos(theta) * speed;
                 this.velocities[i3 + 1] = Math.sin(phi) * Math.sin(theta) * speed;
@@ -767,7 +769,7 @@
             const scale = this.config.textScale;
 
             /* 拼字时粒子变小、深度收窄，文字更清晰 */
-            this.particles.material.size = this.config.particleSize * (this.isMobile ? 1.0 : 0.8);
+            this.particles.material.size = this.config.particleSize * (this.isMobile ? 1.3 : 1.1);
 
             /* 文字粒子：每个文字像素约 2 个，避免堆叠成团 */
             const textUse = Math.min(pCount, Math.floor(validCount * (this.isMobile ? 2.0 : 1.8)));
@@ -782,7 +784,7 @@
 
                 /* 金→暖白渐变，呼应梵高的金星 */
                 const nx = (targetPixel.x + canvasWidth / 2) / canvasWidth;
-                this.colorObj.setHSL(0.12 - nx * 0.03, 0.95, 0.62 + nx * 0.22);
+                this.colorObj.setHSL(0.12 - nx * 0.03, 0.95, 0.70 + nx * 0.24);
                 this.colors[i3] = this.colorObj.r;
                 this.colors[i3 + 1] = this.colorObj.g;
                 this.colors[i3 + 2] = this.colorObj.b;
@@ -1543,8 +1545,8 @@ $('blowBtn').addEventListener('pointerdown', function(ev){ ev.stopPropagation();
           particleCount: isMobile ? 30000 : 40000,
           particleSize: isMobile ? 2.0 : 3.2
         };
-        if(isMobile){ opts.fov = 60; opts.cameraZ = 265; opts.textScale = 1.4; }
-        else { opts.fov = 48; opts.cameraZ = 385; opts.textScale = 0.46; }
+        if(isMobile){ opts.fov = 60; opts.cameraZ = 265; opts.textScale = 1.5; }
+        else { opts.fov = 48; opts.cameraZ = 385; opts.textScale = 0.55; }
         cake = new window.ParticleCake(box, opts);
         window.__cake = cake;
         cakeReady = true;
@@ -1580,7 +1582,27 @@ $('blowBtn').addEventListener('pointerdown', function(ev){ ev.stopPropagation();
     celebrated = true;
     micStop();
     playSnd('bless');
-    if(cakeReady && cake){ try{ cake.explode(); }catch(e){} }
+    if(cakeReady && cake){
+      try{
+        cake.explode();
+        var cbox = $('cake-box');
+        cbox.classList.add('final');
+        var halo = document.querySelector('.cake-halo');
+        if(halo) halo.style.display = 'none';
+        setTimeout(function(){
+          try{
+            if(cake.onWindowResize) cake.onWindowResize();
+            if(cake.camera){
+              var m = window.innerWidth < 768;
+              cake.camera.fov = m ? 76 : 60;
+              cake.camera.position.z = m ? 400 : 540;
+              cake.camera.position.y = 0;
+              cake.camera.updateProjectionMatrix();
+            }
+          }catch(e){}
+        }, 60);
+      }catch(e){}
+    }
     whoosh(); chime();
     if(!musicOn) setTimeout(function(){ song(); }, 700);
     startFireworks();
